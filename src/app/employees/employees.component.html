@@ -1,0 +1,207 @@
+<div class="container mt-4">
+  <button class="btn btn-primary" (click)="openEmployeeModal()">
+    Add New Employee
+  </button>
+  <table class="table mt-3 rounded table-hover">
+    <thead class="table-dark px-3">
+      <tr>
+        <th>Sr No</th>
+        <th>Employee ID</th>
+        <th>Name</th>
+        <th>Designation</th>
+        <th>Email</th>
+        <th>Dob</th>
+        
+        <th>Photo</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody class="table-secondary table-striped">
+      <tr *ngFor="let employee of employees; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ employee.employeeId }}</td>
+        <td>{{ employee.employeeName }}</td>
+        <td>{{ employee.designation }}</td>
+        <td>{{ employee.email }}</td>
+        <td>{{ employee.dob | date:'dd-MM-yyyy' }}</td>
+
+        <td>
+          <img
+            *ngIf="employee.employeePhoto"
+            [src]="employee.employeePhoto"
+            alt="Employee Photo"
+            style="width: 50px; height: 50px; object-fit: cover"
+          />
+        </td>
+        <td>
+          <button
+            class="btn btn-primary mx-2 px-3"
+            (click)="openEmployeeModal(employee)"
+          >
+            Edit
+          </button>
+          <button
+            class="btn btn-danger mx-2 px-3"
+            (click)="deleteEmployee(employee._id)"
+          >
+            Delete
+          </button>
+          <button
+            class="btn btn-success mx-2 px-3"
+            (click)="openGenerateIDModal(employee)"
+          >
+            Generate ID
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Employee Modal -->
+<div
+  class="modal fade"
+  id="employeeModal"
+  tabindex="-1"
+  aria-labelledby="employeeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="employeeModalLabel">
+          {{ selectedEmployeeId ? 'Edit Employee' : 'Add Employee' }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <!-- Employee Form -->
+        <form (ngSubmit)="saveEmployee()">
+            <input type="hidden" class="form-control" [(ngModel)]="employeeForm.employeeId" name="employeeId" placeholder="Enter Employee ID" required />
+
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" [(ngModel)]="employeeForm.employeeName" name="employeeName" placeholder="Enter Full Name" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Designation</label>
+            <input type="text" class="form-control" [(ngModel)]="employeeForm.designation" name="designation" placeholder="Enter Designation" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" [(ngModel)]="employeeForm.email" name="email" placeholder="Enter Email Address" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" class="form-control" [(ngModel)]="employeeForm.dob" name="dob" placeholder="Select Date of Birth" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Mobile</label>
+            <input type="text" class="form-control" [(ngModel)]="employeeForm.mobile" name="mobile" placeholder="Enter Mobile Number" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <textarea class="form-control" [(ngModel)]="employeeForm.address" name="address" placeholder="Enter Address" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Blood Group</label>
+            <input type="text" class="form-control" [(ngModel)]="employeeForm.bloodGroup" name="bloodGroup" placeholder="Enter Blood Group (e.g., O+)" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Upload Photo</label>
+            <input type="file" class="form-control" (change)="onPhotoUpload($event)" />
+            <img *ngIf="employeeForm.employeePhoto" [src]="employeeForm.employeePhoto" alt="Employee Photo"
+              style="width: 100px; height: 100px; object-fit: cover; margin-top: 10px; border-radius: 10%;" />
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">
+              {{ selectedEmployeeId ? 'Update Employee' : 'Add Employee' }}
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Employee ID Card Content (hidden for generating PDF/Image) -->
+<div id="employeeIDCard" style="display: none;">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center">
+        <img
+          *ngIf="employeeForm.employeePhoto"
+          [src]="employeeForm.employeePhoto"
+          alt="Employee Photo"
+          style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;"
+        />
+        <h4>{{ employeeForm.employeeName }}</h4>
+        <p><strong>Employee ID: </strong>{{ employeeForm.employeeId }}</p>
+        <p><strong>Designation: </strong>{{ employeeForm.designation }}</p>
+        <p><strong>Email: </strong>{{ employeeForm.email }}</p>
+        <p><strong>Date of Birth: </strong>{{ employeeForm.dob | date:'dd-MM-yyyy' }}</p>
+        <p><strong>Mobile: </strong>{{ employeeForm.mobile }}</p>
+        <p><strong>Address: </strong>{{ employeeForm.address }}</p>
+        <p><strong>Blood Group: </strong>{{ employeeForm.bloodGroup }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Generating ID Card -->
+<div class="modal fade" id="generateIDModal" tabindex="-1" aria-labelledby="generateIDModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="generateIDModalLabel">Employee ID Card</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="employeeIDCard">
+          <div class="container">
+            <div class="row">
+              <div class="col-12">
+                <div class="text-center align-item-center">
+                  <img *ngIf="employeeForm.employeePhoto" [src]="employeeForm.employeePhoto" alt="Employee Photo" style="width: 150px; height: 150px; object-fit: cover; border-radius: 10%;" />
+                  <h4 class="text-primary">{{ employeeForm.employeeName }}</h4>
+                  <h6 class="bg-primary p-1 rounded text-white fw-bold text-center">{{ employeeForm.designation }}</h6>
+                </div>
+                <p><strong>Employee ID: </strong>{{ employeeForm.employeeId }}</p>
+                <p><strong>Email: </strong>{{ employeeForm.email }}</p>
+                <p><strong>Date of Birth: </strong>{{ employeeForm.dob | date: 'dd-MM-yyyy' }}</p>
+                <p><strong>Mobile: </strong>{{ employeeForm.mobile }}</p>
+                <p><strong>Address: </strong>{{ employeeForm.address }}</p>
+                <p><strong>Blood Group: </strong>{{ employeeForm.bloodGroup }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" (click)="generateIDCard('pdf')">Download PDF</button>
+        <button class="btn btn-warning" (click)="generateIDCard('png')">Download PNG</button>
+        <button class="btn btn-success" (click)="generateIDCard('jpg')">Download JPG</button>
+        <button class="btn btn-info" (click)="generateIDCard('print')">Print</button>
+      </div>
+    </div>
+  </div>
+</div>
+
