@@ -34,6 +34,7 @@ export class EmployeesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEmployees();
+
   }
 
   loadEmployees() {
@@ -43,6 +44,7 @@ export class EmployeesComponent implements OnInit {
           employee.employeePhoto = `http://localhost:5000${employee.employeePhoto}`;
         }
         return employee;
+        
       });
     });
   }
